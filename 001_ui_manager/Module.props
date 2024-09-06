@@ -1,0 +1,6 @@
+
+<Project>
+	<PropertyGroup>
+		<DefineConstants>$(DefineConstants);MODULE_UI_MANAGER</DefineConstants>
+	</PropertyGroup>
+</Project>

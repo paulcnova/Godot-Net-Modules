@@ -171,5 +171,39 @@ internal static class Extension_Node
 			}
 		}
 	}
+	
+	public static void SetActive(this CanvasItem item, bool isActive)
+	{
+		item.Visible = isActive;
+		item.ProcessMode = isActive ? Node.ProcessModeEnum.Inherit : Node.ProcessModeEnum.Disabled;
+	}
+	
+	public static void SetEnabled(this CanvasItem item, bool isEnabled)
+	{
+		item.ProcessMode = isEnabled ? Node.ProcessModeEnum.Inherit : Node.ProcessModeEnum.Disabled;
+	}
+	
+	public static void SetActive(this Node3D node, bool isActive)
+	{
+		node.Visible = isActive;
+		node.ProcessMode = isActive ? Node.ProcessModeEnum.Inherit : Node.ProcessModeEnum.Disabled;
+	}
+	
+	public static void SetEnabled(this Node3D node, bool isEnabled)
+	{
+		node.ProcessMode = isEnabled ? Node.ProcessModeEnum.Inherit : Node.ProcessModeEnum.Disabled;
+	}
+	
+	public static void SetActive(this Node2D node, bool isActive)
+	{
+		node.Visible = isActive;
+		node.ProcessMode = isActive ? Node.ProcessModeEnum.Inherit : Node.ProcessModeEnum.Disabled;
+	}
+	
+	public static void SetEnabled(this Node2D node, bool isEnabled)
+	{
+		node.ProcessMode = isEnabled ? Node.ProcessModeEnum.Inherit : Node.ProcessModeEnum.Disabled;
+	}
+	
 	#endregion // Public Methods
 }
