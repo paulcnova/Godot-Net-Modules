@@ -1,0 +1,6 @@
+
+<Project>
+	<PropertyGroup>
+		<DefineConstants>$(DefineConstants);MODULE_CHECK_BOX_AND_RADIO_CONTAINERS</DefineConstants>
+	</PropertyGroup>
+</Project>
