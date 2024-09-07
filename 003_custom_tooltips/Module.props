@@ -1,0 +1,6 @@
+
+<Project>
+	<PropertyGroup>
+		<DefineConstants>$(DefineConstants);MODULE_CUSTOM_TOOLTIPS</DefineConstants>
+	</PropertyGroup>
+</Project>
