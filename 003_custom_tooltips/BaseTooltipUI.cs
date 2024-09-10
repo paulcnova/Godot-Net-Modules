@@ -9,7 +9,7 @@ using Godot;
 {
 	#region Properties
 	
-	private const string TooltipPrefabBase = "res://ui/prefabs/tooltips";
+	private const string TooltipPrefabBase = "res://interface/tooltips";
 	private const string GeneralTooltipPrefabBase = $"{TooltipPrefabBase}/general_tooltip.tscn";
 	
 	private Timer delayTimer;
@@ -19,6 +19,7 @@ using Godot;
 	internal bool isTryingToExit = false;
 	internal bool isTryingToFree = true;
 	
+	[Export] public ColorRect Backdrop { get; set; }
 	[Export] public PanelContainer Container { get; set; }
 	[Export] public Label TooltipName { get; set; }
 	[Export] public RichTextLabel TooltipDescription { get; set; }
@@ -34,6 +35,22 @@ using Godot;
 	[Export] public float FadeInTimer { get; set; } = 0.15f;
 	
 	public bool IsInspecting => this.isInspecting;
+	public bool IsNestedTooltip
+	{
+		get
+		{
+			Node parent = this.GetParent();
+			
+			while(parent != null)
+			{
+				if(parent is BaseTooltipUI) { return true; }
+				
+				parent = parent.GetParent();
+			}
+			
+			return false;
+		}
+	}
 	
 	#endregion // Properties
 	
@@ -42,6 +59,7 @@ using Godot;
 	public override void _Ready()
 	{
 		this.MouseFilter = MouseFilterEnum.Ignore;
+		this.Backdrop.Visible = false;
 		this.delayTimer = new Timer();
 		this.delayTimer.Timeout += this.ShowTooltip;
 		this.AddChild(this.delayTimer);
@@ -77,6 +95,7 @@ using Godot;
 				{
 					this.isInspecting = true;
 					this.MouseFilter = MouseFilterEnum.Stop;
+					this.Backdrop.Visible = !this.IsNestedTooltip;
 				}
 			}
 			else
@@ -85,6 +104,7 @@ using Godot;
 				{
 					this.isInspecting = false;
 					this.MouseFilter = MouseFilterEnum.Ignore;
+					this.Backdrop.Visible = false;
 					if(this.isTryingToExit)
 					{
 						this.Hide();
@@ -129,6 +149,14 @@ using Godot;
 		}
 		
 		tooltip.TopLevel = true;
+		tooltip.Container.CustomMinimumSize = new Vector2(
+			entry.RecommendedTooltipWidth > 0
+				? entry.RecommendedTooltipWidth
+				: tooltip.Container.CustomMinimumSize.X,
+			entry.RecommendedTooltipHeight > 0
+				? entry.RecommendedTooltipHeight
+				: tooltip.Container.CustomMinimumSize.Y
+		);
 		tooltip.Setup(entry);
 		tooltip.Container.ResetSize();
 		
@@ -178,19 +206,16 @@ using Godot;
 		Vector2 border = this.GetViewport().GetVisibleRect().Size - this.Padding;
 		Vector2 position = this.GetTooltipPosition();
 		float finalX = position.X + this.Offset.X;
-		float finalY = position.Y - this.tooltipSize.Y + this.Offset.Y;
+		float finalY = position.Y + this.Offset.Y;
 		
 		if(finalX + this.tooltipSize.X > border.X)
 		{
 			finalX = position.X - this.Offset.X - this.tooltipSize.X;
 		}
-		if(finalY < this.Padding.Y)
+		if(finalY + this.tooltipSize.Y > border.Y)
 		{
-			finalY = position.Y + this.Offset.Y;
+			finalY = position.Y - this.Offset.Y - this.tooltipSize.Y;
 		}
-		
-		// finalX = Mathf.Clamp(finalX, this.Padding.X, border.X - this.tooltipSize.X);
-		// finalY = Mathf.Clamp(finalY, this.Padding.Y, border.Y - this.tooltipSize.Y);
 		
 		this.Container.Position = new Vector2(finalX, finalY);
 	}

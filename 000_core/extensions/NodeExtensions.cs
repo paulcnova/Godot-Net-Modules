@@ -65,6 +65,8 @@ internal static class Extension_Node
 		{
 			Node temp = queue.Dequeue();
 			
+			if(temp == null) { break; }
+			
 			if(temp is T result)
 			{
 				return result;

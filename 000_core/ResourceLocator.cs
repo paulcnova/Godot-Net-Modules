@@ -104,6 +104,27 @@ public static class ResourceLocator
 		return resources;
 	}
 	
+	public static Array<T> LoadAllWithSpecificSuffix<[MustBeVariant] T>(string path, string suffix, bool recursive = true) where T : Resource
+	{
+		Array<T> resources = new Array<T>();
+		Array<string> files = GetFiles(path, recursive);
+		
+		foreach(string file in files)
+		{
+			string correctedFilename = CorrectFileName(file);
+		
+			if(Regex.IsMatch(file, $@"\.{suffix}$"))
+			{
+				if(ResourceLoader.Exists(correctedFilename))
+				{
+					resources.Add(ResourceLoader.Load<T>(correctedFilename));
+				}
+			}
+		}
+		
+		return resources;
+	}
+	
 	#endregion // Public Methods
 	
 	#region Private Methods

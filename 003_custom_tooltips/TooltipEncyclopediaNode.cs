@@ -10,7 +10,7 @@ namespace FLCore.Tooltips
 	{
 		#region Properties
 		
-		private const string GameDataPath = "res://game_data/";
+		private const string GameDataPath = "res://content/game_data/";
 		
 		public static TooltipEncyclopediaNode Instance { get; private set; }
 		
@@ -52,7 +52,12 @@ namespace FLCore.Tooltips
 			
 			if(resource == null) { return null; }
 			
-			BaseTooltipUI tooltip = BaseTooltipUI.Create(tooltipID, resource.TooltipCategory);
+			BaseTooltipUI tooltip = BaseTooltipUI.Create(
+				tooltipID,
+				!string.IsNullOrEmpty(resource.OverrideTooltipCategory)
+					? resource.OverrideTooltipCategory
+					: resource.TooltipCategory
+			);
 			
 			if(tooltip == null) { return null; }
 			
@@ -65,7 +70,7 @@ namespace FLCore.Tooltips
 		
 		private void FindTooltipEntries()
 		{
-			Array<DisplayableResource> entries = ResourceLocator.LoadAll<DisplayableResource>(GameDataPath);
+			Array<DisplayableResource> entries = ResourceLocator.LoadAll<DisplayableResource>(GameDataPath, ".+");
 			
 			foreach(DisplayableResource entry in entries)
 			{
