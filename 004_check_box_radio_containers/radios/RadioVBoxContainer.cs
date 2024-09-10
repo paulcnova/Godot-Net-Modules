@@ -34,7 +34,7 @@ using Godot;
 	
 	public override void _Ready()
 	{
-		foreach(Button child in this.GetAllChildrenOf<Button>())
+		foreach(Node child in this.GetChildren())
 		{
 			this.OnChildEnteredTree(child);
 		}
@@ -130,9 +130,20 @@ using Godot;
 	
 	protected virtual void OnSelect(Button button)
 	{
-		foreach(Button btn in this.GetAllChildrenOf<Button>())
+		foreach(Node child in this.GetChildren())
 		{
-			btn.ButtonPressed = false;
+			if(child is Button btn)
+			{
+				btn.ButtonPressed = false;
+				if(btn.HasMethod("UpdateOnUnselected"))
+				{
+					btn.Call("UpdateOnUnselected");
+				}
+			}
+		}
+		if(button.HasMethod("UpdateOnSelected"))
+		{
+			button.Call("UpdateOnSelected");
 		}
 		button.ButtonPressed = true;
 		this.SetSelected(button);

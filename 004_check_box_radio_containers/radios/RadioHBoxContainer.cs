@@ -120,7 +120,15 @@ using Godot;
 			if(child is Button btn)
 			{
 				btn.ButtonPressed = false;
+				if(btn.HasMethod("UpdateOnUnselected"))
+				{
+					btn.Call("UpdateOnUnselected");
+				}
 			}
+		}
+		if(button.HasMethod("UpdateOnSelected"))
+		{
+			button.Call("UpdateOnSelected");
 		}
 		button.ButtonPressed = true;
 		this.SetSelected(button);
