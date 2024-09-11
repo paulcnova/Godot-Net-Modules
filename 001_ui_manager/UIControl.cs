@@ -16,6 +16,8 @@ public abstract partial class UIControl : Control
 	
 	public bool IsOn { get; protected set; } = false;
 	
+	[Signal] public delegate void ViewChangedEventHandler(Page page, UIView oldView, PageView newView);
+	
 	#endregion // Properties
 	
 	#region Public Methods
@@ -30,6 +32,15 @@ public abstract partial class UIControl : Control
 		Node parent = this.GetParent();
 		
 		parent.MoveChild(this, parent.GetChildCount());
+	}
+	
+	public virtual void ChangeView(ViewType nextViewType)
+	{
+		UIView oldView = this.GetViewByType(this.ViewType);
+		UIView newView = this.GetViewByType(this.ViewType);
+		
+		this.OnToggle(nextViewType);
+		this.EmitSignal(SignalName.ViewChanged, this, oldView, newView);
 	}
 	
 	#endregion // Public Methods
@@ -76,14 +87,15 @@ public abstract partial class UIControl : Control
 		{
 			UIView view = this.GetViewByType(this.ViewType);
 			
+			view?.OnDisable();
 			view?.SetActive(false);
 		}
 		
 		UIView newView = this.GetViewByType(nextViewType);
 		
-		newView?.SetActive(true);
 		this.ViewType = nextViewType;
-		newView?.OnToggle();
+		newView?.OnEnable();
+		newView?.SetActive(true);
 	}
 	
 	protected Node FindTopmostParent()
@@ -141,7 +153,7 @@ public abstract partial class UIControl : Control
 		this.IsOn = false;
 	}
 	
-	private UIView GetViewByType(ViewType type) => type switch
+	protected UIView GetViewByType(ViewType type) => type switch
 	{
 		ViewType.Keyboard => this.KeyboardView,
 		ViewType.Gamepad => this.GamepadView,

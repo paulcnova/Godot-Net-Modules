@@ -16,7 +16,8 @@ public abstract partial class UIView : Control
 	public virtual void OnEnterTree() {}
 	public virtual void OnQuit() {}
 	public virtual void OnProcess(float delta) {}
-	public virtual void OnToggle() {}
+	public virtual void OnEnable() {}
+	public virtual void OnDisable() {}
 	
 	#endregion // Public Methods
 	

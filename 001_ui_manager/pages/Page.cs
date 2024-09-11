@@ -14,7 +14,6 @@ public abstract partial class Page : UIControl
 	[Signal] public delegate void ToggledEventHandler(Page page);
 	[Signal] public delegate void ToggledOnEventHandler(Page page);
 	[Signal] public delegate void ToggledOffEventHandler(Page page);
-	[Signal] public delegate void ChangeViewEventHandler(Page page, PageView oldView, PageView newView);
 	
 	#endregion // Properties
 	

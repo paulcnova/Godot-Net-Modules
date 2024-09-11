@@ -17,7 +17,6 @@ public abstract partial class Widget : UIControl
 	[Signal] public delegate void ToggledEventHandler(Widget widget);
 	[Signal] public delegate void ToggledOnEventHandler(Widget widget);
 	[Signal] public delegate void ToggledOffEventHandler(Widget widget);
-	[Signal] public delegate void ChangeViewEventHandler(Widget widget, WidgetView oldView, WidgetView newView);
 	
 	#endregion // Properties
 	

@@ -70,8 +70,21 @@ namespace FLCore.UI
 		
 		#region Pages Methods
 		
-		// public T SwapViewForPage<T>(ViewType viewType) where T : Page
-		// public T SwapViewForWidget<T>(ViewType viewType) where T : Widget
+		public Page ChangeCurrentPageView(ViewType viewType) => this.CurrentPage != null ? this.ChangePageView(this.CurrentPage.GetType(), viewType) : null;
+		public T ChangePageView<T>(ViewType viewType) where T : Page => this.ChangePageView(typeof(T), viewType) as T;
+		public Page ChangePageView(System.Type type, ViewType viewType)
+		{
+			Page page = this.GetPage(type);
+			
+			if(page == null)
+			{
+				return null;
+			}
+			
+			page.ChangeView(viewType);
+			
+			return page;
+		}
 		
 		public T OpenPage<T>(UITransition transition = null) where T : Page => this.OpenPage(typeof(T), transition) as T;
 		public Page OpenPage(System.Type type, UITransition transition = null)
@@ -209,6 +222,21 @@ namespace FLCore.UI
 		#endregion // Pages Methods
 		
 		#region Widget Methods
+		
+		public T ChangeWidgetView<T>(ViewType viewType) where T : Widget => this.ChangeWidgetView(typeof(T), viewType) as T;
+		public Widget ChangeWidgetView(System.Type type, ViewType viewType)
+		{
+			Widget widget = this.GetWidget(type);
+			
+			if(widget == null)
+			{
+				return null;
+			}
+			
+			widget.ChangeView(viewType);
+			
+			return widget;
+		}
 		
 		public T ShowWidget<T>(UITransition transition = null) where T : Widget => this.ShowWidget(typeof(T), transition) as T;
 		public Widget ShowWidget(System.Type type, UITransition transition = null)
@@ -500,6 +528,36 @@ namespace FLCore
 		
 		#region Pages Methods
 		
+		public static Page ChangeCurrentPageView(ViewType viewType)
+		{
+			if(UIManagerNode.Instance == null)
+			{
+				GDX.PrintWarning($"UI Manager is not instantiated! Could not change current page's view to {viewType}");
+				return null;
+			}
+			return UIManagerNode.Instance.ChangeCurrentPageView(viewType);
+		}
+		
+		public static T ChangePageView<T>(ViewType viewType) where T : Page
+		{
+			if(UIManagerNode.Instance == null)
+			{
+				GDX.PrintWarning($"UI Manager is not instantiated! Could not change page's view: {typeof(T)}; to {viewType}");
+				return null;
+			}
+			return UIManagerNode.Instance.ChangePageView<T>(viewType);
+		}
+		
+		public static Page ChangePageView(System.Type type, ViewType viewType)
+		{
+			if(UIManagerNode.Instance == null)
+			{
+				GDX.PrintWarning($"UI Manager is not instantiated! Could not change page's view: {type}; to {viewType}");
+				return null;
+			}
+			return UIManagerNode.Instance.ChangePageView(type, viewType);
+		}
+		
 		public static T OpenPage<T>(UITransition transition = null) where T : Page
 		{
 			if(UIManagerNode.Instance == null)
@@ -576,6 +634,26 @@ namespace FLCore
 		#endregion // Pages Methods
 		
 		#region Widget Methods
+		
+		public static T ChangeWidgetView<T>(ViewType viewType) where T : Widget
+		{
+			if(UIManagerNode.Instance == null)
+			{
+				GDX.PrintWarning($"UI Manager is not instantiated! Could not change widget's view type: {typeof(T)}; to {viewType}");
+				return null;
+			}
+			return UIManagerNode.Instance.ChangeWidgetView<T>(viewType);
+		}
+		
+		public static Widget ChangeWidgetView(System.Type type, ViewType viewType)
+		{
+			if(UIManagerNode.Instance == null)
+			{
+				GDX.PrintWarning($"UI Manager is not instantiated! Could not change widget's view type: {type}; to {viewType}");
+				return null;
+			}
+			return UIManagerNode.Instance.ChangeWidgetView(type, viewType);
+		}
 		
 		public static T ShowWidget<T>(UITransition transition = null) where T : Widget
 		{
