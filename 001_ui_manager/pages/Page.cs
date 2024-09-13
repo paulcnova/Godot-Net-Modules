@@ -19,11 +19,12 @@ public abstract partial class Page : UIControl
 	
 	#region Private Methods
 	
-	internal void Toggle(bool on, UITransition transition = null)
+	internal void Toggle(ViewType viewType, bool on, UITransition transition = null)
 	{
 		if(this.IsOn != on)
 		{
 			this.IsOn = on;
+			this.ViewType = viewType;
 			if(transition == null || (
 				transition.UseAsyncFades
 					? ((this.IsOn && transition.FadeTransition <= 0.0f) || (!this.IsOn && transition.PreviousFadeTransition <= 0.0f))
@@ -50,7 +51,21 @@ public abstract partial class Page : UIControl
 				}
 				this.fadeTransition = Timing.RunCoroutine(this.Transition(transition));
 			}
-			this.OnToggle(this.ViewType);
+			
+			if(this.IsOn)
+			{
+				this.OnEnable();
+				this.OnToggle(this.ViewType);
+			}
+			else
+			{
+				this.OnDisable();
+			}
+		}
+		else if(this.ViewType != viewType)
+		{
+			this.ViewType = viewType;
+			this.ChangeView(this.ViewType);
 		}
 	}
 	

@@ -22,10 +22,10 @@ public abstract partial class UIControl : Control
 	
 	#region Public Methods
 	
-	public T DataAs<T>() where T : PageData => this.Data as T;
-	public T KeyboardViewAs<T>() where T : PageView => this.KeyboardView as T;
-	public T GamepadViewAs<T>() where T : PageView => this.KeyboardView as T;
-	public T MobileViewAs<T>() where T : PageView => this.KeyboardView as T;
+	public T DataAs<T>() where T : UIData => this.Data as T;
+	public T KeyboardViewAs<T>() where T : UIView => this.KeyboardView as T;
+	public T GamepadViewAs<T>() where T : UIView => this.KeyboardView as T;
+	public T MobileViewAs<T>() where T : UIView => this.KeyboardView as T;
 	
 	public virtual void BringToFront()
 	{
@@ -36,11 +36,12 @@ public abstract partial class UIControl : Control
 	
 	public virtual void ChangeView(ViewType nextViewType)
 	{
-		UIView oldView = this.GetViewByType(this.ViewType);
-		UIView newView = this.GetViewByType(this.ViewType);
+		UIView oldView = this.GetView(this.ViewType);
+		UIView newView = this.GetView(nextViewType);
 		
-		this.OnToggle(nextViewType);
+		this.OnViewChanged(oldView, newView);
 		this.EmitSignal(SignalName.ViewChanged, this, oldView, newView);
+		this.OnChangeView(nextViewType);
 	}
 	
 	#endregion // Public Methods
@@ -60,6 +61,8 @@ public abstract partial class UIControl : Control
 	
 	#region Private Methods
 	
+	protected virtual void OnViewChanged(UIView oldView, UIView newView) {}
+	
 	protected virtual void OnEnterTree()
 	{
 		this.KeyboardView?.OnEnterTree();
@@ -67,36 +70,53 @@ public abstract partial class UIControl : Control
 		this.MobileView?.OnEnterTree();
 	}
 	
-	protected virtual void OnQuit()
+	protected virtual void OnExitTree()
 	{
-		this.KeyboardView?.OnQuit();
-		this.GamepadView?.OnQuit();
-		this.MobileView?.OnQuit();
+		this.KeyboardView?.OnExitTree();
+		this.GamepadView?.OnExitTree();
+		this.MobileView?.OnExitTree();
 	}
 	
-	protected virtual void OnProcess(float delta) => this.GetViewByType(this.ViewType)?.OnProcess(delta);
+	protected virtual void OnInput(InputEvent ev)
+	{
+		this.GetView(this.ViewType)?.OnInput(ev);
+	}
+	
+	protected virtual void OnProcess(float delta) => this.GetView(this.ViewType)?.OnProcess(delta);
 	
 	protected virtual void TransitionView(ViewType current, ViewType nextViewType, UITransition transition)
 	{
 		// TODO: Add transition
 	}
 	
-	protected virtual void OnToggle(ViewType nextViewType)
+	protected virtual void OnChangeView(ViewType nextViewType)
 	{
 		if(nextViewType != this.ViewType)
 		{
-			UIView view = this.GetViewByType(this.ViewType);
+			UIView view = this.GetView(this.ViewType);
 			
 			view?.OnDisable();
 			view?.SetActive(false);
 		}
 		
-		UIView newView = this.GetViewByType(nextViewType);
+		UIView newView = this.GetView(nextViewType);
 		
 		this.ViewType = nextViewType;
 		newView?.OnEnable();
 		newView?.SetActive(true);
 	}
+	
+	protected virtual void OnToggle(ViewType nextViewType)
+	{
+		UIView newView = this.GetView(nextViewType);
+		
+		this.ViewType = nextViewType;
+		newView?.OnEnable();
+		newView?.SetActive(true);
+	}
+	
+	protected virtual void OnEnable() {}
+	protected virtual void OnDisable() {}
 	
 	protected Node FindTopmostParent()
 	{
@@ -153,7 +173,11 @@ public abstract partial class UIControl : Control
 		this.IsOn = false;
 	}
 	
-	protected UIView GetViewByType(ViewType type) => type switch
+	protected T GetCurrentView<T>() where T : UIView => this.GetView<T>(this.ViewType);
+	protected T GetView<T>(ViewType type) where T : UIView => this.GetView(this.ViewType) as T;
+	
+	protected UIView GetCurrentView() => this.GetView(this.ViewType);
+	protected UIView GetView(ViewType type) => type switch
 	{
 		ViewType.Keyboard => this.KeyboardView,
 		ViewType.Gamepad => this.GamepadView,

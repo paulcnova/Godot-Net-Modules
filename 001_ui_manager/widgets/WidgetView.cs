@@ -5,7 +5,7 @@ public abstract partial class WidgetView : UIView
 {
 	#region Properties
 	
-	public Widget Parent => this.GetParentOrNull<Widget>();
+	public Widget Widget => this.GetParentOrNull<Widget>();
 	
 	#endregion // Properties
 }

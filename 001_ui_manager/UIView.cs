@@ -9,21 +9,22 @@ public abstract partial class UIView : Control
 	
 	[Export] public ViewType ViewType { get; set; }
 	
+	public UIControl Parent => this.GetParentOrNull<UIControl>();
+	
 	#endregion // Properties
 	
 	#region Public Methods
 	
 	public virtual void OnEnterTree() {}
-	public virtual void OnQuit() {}
+	public virtual void OnExitTree() {}
 	public virtual void OnProcess(float delta) {}
 	public virtual void OnEnable() {}
 	public virtual void OnDisable() {}
+	public virtual void OnInput(InputEvent ev) {}
 	
-	#endregion // Public Methods
+	public T DataAs<T>() where T : UIData => this.Parent.DataAs<T>();
 	
-	#region Private Methods
-	
-	protected void SetActive(bool isActive)
+	public void SetActive(bool isActive)
 	{
 		this.Visible = isActive;
 		this.ProcessMode = isActive
@@ -31,7 +32,7 @@ public abstract partial class UIView : Control
 			: Node.ProcessModeEnum.Disabled;
 	}
 	
-	protected void SetAlpha(float alpha)
+	public void SetAlpha(float alpha)
 	{
 		Color color = this.Modulate;
 		
@@ -39,5 +40,5 @@ public abstract partial class UIView : Control
 		this.Modulate = color;
 	}
 	
-	#endregion // Private Methods
+	#endregion // Public Methods
 }

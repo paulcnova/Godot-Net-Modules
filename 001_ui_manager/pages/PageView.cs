@@ -5,7 +5,7 @@ public abstract partial class PageView : UIView
 {
 	#region Properties
 	
-	public Page Parent => this.GetParentOrNull<Page>();
+	public Page Page => this.GetParentOrNull<Page>();
 	
 	#endregion // Properties
 }

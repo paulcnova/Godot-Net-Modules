@@ -21,6 +21,7 @@ namespace FLCore.UI
 		[Export] public Page StartingPage { get; private set; }
 		[Export] public Control PagesContainer { get; private set; }
 		[Export] public Control WidgetsContainer { get; private set; }
+		[Export] public ViewType ViewType { get; private set; }= ViewType.Keyboard;
 		
 		[ExportGroup("Debug")]
 		[Export] public Page CurrentPage { get; private set; }
@@ -62,7 +63,29 @@ namespace FLCore.UI
 			base._ExitTree();
 		}
 		
-		// TODO: Check for input changes and then swap views
+		public override void _Input(InputEvent ev)
+		{
+			if(ev is InputEventJoypadButton)
+			{
+				this.UpdateAllViews(ViewType.Gamepad);
+			}
+			else if(ev is InputEventJoypadMotion motion && Mathf.Abs(motion.AxisValue) >= 0.24f)
+			{
+				this.UpdateAllViews(ViewType.Gamepad);
+			}
+			else if(ev is InputEventKey || ev is InputEventMouse)
+			{
+				this.UpdateAllViews(ViewType.Keyboard);
+			}
+			this.CurrentPage.Call(UIControl.MethodName.OnInput, ev);
+			foreach(System.Type type in this.widgetsShown)
+			{
+				Widget widget = this.GetWidget(type);
+				
+				if(widget == null) { continue; }
+				widget.Call(UIControl.MethodName.OnInput, ev);
+			}
+		}
 		
 		#endregion // Godot Methods
 		
@@ -99,7 +122,7 @@ namespace FLCore.UI
 			
 			if(this.CurrentPage != null)
 			{
-				this.CurrentPage.Toggle(false, transition);
+				this.CurrentPage.Toggle(this.ViewType, false, transition);
 				if(!this.ignoreAddingToHistory)
 				{
 					this.history.Push(this.CurrentPage.GetType());
@@ -107,7 +130,7 @@ namespace FLCore.UI
 			}
 			
 			this.CurrentPage = page;
-			page.Toggle(true, transition);
+			page.Toggle(this.ViewType, true, transition);
 			if(!this.ignoreAddingToHistory && this.future.Count > 0)
 			{
 				this.future.Clear();
@@ -132,7 +155,7 @@ namespace FLCore.UI
 			
 			if(this.CurrentPage != null)
 			{
-				this.CurrentPage.Toggle(false, transition);
+				this.CurrentPage.Toggle(this.ViewType, false, transition);
 				if(!this.ignoreAddingToHistory)
 				{
 					this.history.Push(this.CurrentPage.GetType());
@@ -144,7 +167,7 @@ namespace FLCore.UI
 			{
 				updateData(page.Data as TData);
 			}
-			page.Toggle(true, transition);
+			page.Toggle(this.ViewType, true, transition);
 			if(!this.ignoreAddingToHistory && this.future.Count > 0)
 			{
 				this.future.Clear();
@@ -157,7 +180,7 @@ namespace FLCore.UI
 		{
 			if(this.CurrentPage != null)
 			{
-				this.CurrentPage.Toggle(false, transition);
+				this.CurrentPage.Toggle(this.ViewType, false, transition);
 				this.history.Push(this.CurrentPage.GetType());
 				if(this.future.Count > 0)
 				{
@@ -249,7 +272,7 @@ namespace FLCore.UI
 				return null;
 			}
 			
-			widget.Toggle(true, transition);
+			widget.Toggle(this.ViewType, true, transition);
 			this.widgetsShown.Add(type);
 			
 			return widget;
@@ -273,7 +296,7 @@ namespace FLCore.UI
 			{
 				updateData(widget.Data as TData);
 			}
-			widget.Toggle(true, transition);
+			widget.Toggle(this.ViewType, true, transition);
 			this.widgetsShown.Add(type);
 			
 			return widget;
@@ -286,7 +309,7 @@ namespace FLCore.UI
 			
 			if(widget == null) { return null; }
 			
-			widget.Toggle(false, transition);
+			widget.Toggle(this.ViewType, false, transition);
 			this.widgetsShown.Remove(type);
 			
 			return widget;
@@ -299,7 +322,7 @@ namespace FLCore.UI
 			
 			if(widget == null) { return null; }
 			
-			widget.Toggle(!widget.IsOn, transition);
+			widget.Toggle(this.ViewType, !widget.IsOn, transition);
 			
 			if(widget.IsOn) { this.widgetsShown.Add(type); }
 			else { this.widgetsShown.Remove(type); }
@@ -407,7 +430,7 @@ namespace FLCore.UI
 			this.CurrentPage = this.StartingPage;
 			if(this.StartingPage != null)
 			{
-				this.StartingPage.Toggle(true);
+				this.StartingPage.Toggle(this.ViewType, true);
 			}
 		}
 		
@@ -452,6 +475,10 @@ namespace FLCore.UI
 			foreach(Page page in this.pages.Values)
 			{
 				page.Call(UIControl.MethodName.OnEnterTree);
+				page.ViewType = this.ViewType;
+				page.KeyboardView?.SetActive(this.ViewType == ViewType.Keyboard);
+				page.GamepadView?.SetActive(this.ViewType == ViewType.Gamepad);
+				page.MobileView?.SetActive(this.ViewType == ViewType.Mobile);
 			}
 			
 			foreach(Widget widget in this.widgets.Values)
@@ -460,7 +487,7 @@ namespace FLCore.UI
 				if(widget.ShowOnStartup)
 				{
 					// TODO: Change this to ResetTransition
-					widget.Toggle(widget.IsOn, new FadeTransition(true));
+					widget.Toggle(this.ViewType, widget.IsOn, new FadeTransition(true));
 					this.widgetsShown.Add(widget.GetType());
 				}
 			}
@@ -468,6 +495,26 @@ namespace FLCore.UI
 			foreach(Widget widget in this.widgets.Values)
 			{
 				widget.Call(UIControl.MethodName.OnEnterTree);
+				widget.ViewType = this.ViewType;
+				widget.KeyboardView.SetActive(this.ViewType == ViewType.Keyboard);
+				widget.GamepadView.SetActive(this.ViewType == ViewType.Gamepad);
+				widget.MobileView.SetActive(this.ViewType == ViewType.Mobile);
+			}
+		}
+		
+		private void UpdateAllViews(ViewType nextViewType)
+		{
+			this.ViewType = nextViewType;
+			if(this.CurrentPage != null)
+			{
+				this.CurrentPage.ChangeView(this.ViewType);
+			}
+			foreach(System.Type type in this.widgetsShown)
+			{
+				Widget widget = this.GetWidget(type);
+				
+				if(widget == null) { continue; }
+				widget.ChangeView(this.ViewType);
 			}
 		}
 		
@@ -519,6 +566,19 @@ namespace FLCore
 					return null;
 				}
 				return UIManagerNode.Instance.NextPage;
+			}
+		}
+		
+		public static ViewType ViewType
+		{
+			get
+			{
+				if(UIManagerNode.Instance == null)
+				{
+					GDX.PrintWarning($"UI Manager is not instantiated! Could not retrieve view type");
+					return ViewType.Keyboard;
+				}
+				return UIManagerNode.Instance.ViewType;
 			}
 		}
 		
