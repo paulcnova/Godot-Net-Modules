@@ -79,7 +79,12 @@ public static class ResourceLocator
 		
 			if(ResourceLoader.Exists(correctedFilename))
 			{
-				resources.Add(ResourceLoader.Load<T>(correctedFilename));
+				Resource resource = ResourceLoader.Load(correctedFilename);
+				
+				if(resource != null && resource.GetType().IsSubclassOf(typeof(T)))
+				{
+					resources.Add(resource as T);
+				}
 			}
 		}
 		
@@ -97,7 +102,12 @@ public static class ResourceLocator
 			
 			if(ResourceLoader.Exists(correctedFilename))
 			{
-				resources.Add(ResourceLoader.Load<T>(correctedFilename));
+				Resource resource = ResourceLoader.Load(correctedFilename);
+				
+				if(resource != null && resource.GetType().IsSubclassOf(typeof(T)))
+				{
+					resources.Add(resource as T);
+				}
 			}
 		}
 		
@@ -117,7 +127,12 @@ public static class ResourceLocator
 			{
 				if(ResourceLoader.Exists(correctedFilename))
 				{
-					resources.Add(ResourceLoader.Load<T>(correctedFilename));
+					Resource resource = ResourceLoader.Load(correctedFilename);
+					
+					if(resource != null && resource.GetType().IsSubclassOf(typeof(T)))
+					{
+						resources.Add(resource as T);
+					}
 				}
 			}
 		}
