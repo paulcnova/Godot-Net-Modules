@@ -134,7 +134,11 @@ using Godot;
 			GDX.PrintError($"Entry [{entryID}] does not exist, no tooltip is being rendered");
 			return null;
 		}
-		
+		return Create(entry, prefabPath);
+	}
+	
+	public static BaseTooltipUI Create(DisplayableResource entry, string prefabPath)
+	{
 		BaseTooltipUI tooltip = GDX.Instantiate<BaseTooltipUI>($"{TooltipPrefabBase}/{prefabPath}_tooltip.tscn");
 		
 		if(tooltip == null)

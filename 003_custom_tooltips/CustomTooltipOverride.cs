@@ -15,6 +15,7 @@ using Godot;
 	[Export] public string TooltipEntryID { get; set; }
 	[Export] public string TooltipPrefabCategory { get; set; }
 	[Export] public float DelayTime { get; set; } = 0.0f;
+	[Export] public DisplayableResource TooltipData { get; set; }
 	
 	#endregion // Properties
 	
@@ -61,7 +62,9 @@ using Godot;
 	
 	#region Private Methods
 	
-	private BaseTooltipUI CreateTooltip() => BaseTooltipUI.Create(this.TooltipEntryID, this.TooltipPrefabCategory);
+	private BaseTooltipUI CreateTooltip() => this.TooltipData != null
+		? BaseTooltipUI.Create(this.TooltipData, this.TooltipPrefabCategory)
+		: BaseTooltipUI.Create(this.TooltipEntryID, this.TooltipPrefabCategory);
 	
 	private void ShowTooltip()
 	{
