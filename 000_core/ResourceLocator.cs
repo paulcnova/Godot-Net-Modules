@@ -81,7 +81,7 @@ public static class ResourceLocator
 			{
 				Resource resource = ResourceLoader.Load(correctedFilename);
 				
-				if(resource != null && resource.GetType().IsSubclassOf(typeof(T)))
+				if(resource != null && resource.GetType().IsAssignableTo(typeof(T)))
 				{
 					resources.Add(resource as T);
 				}
@@ -104,7 +104,7 @@ public static class ResourceLocator
 			{
 				Resource resource = ResourceLoader.Load(correctedFilename);
 				
-				if(resource != null && resource.GetType().IsSubclassOf(typeof(T)))
+				if(resource != null && resource.GetType().IsAssignableTo(typeof(T)))
 				{
 					resources.Add(resource as T);
 				}
@@ -129,7 +129,7 @@ public static class ResourceLocator
 				{
 					Resource resource = ResourceLoader.Load(correctedFilename);
 					
-					if(resource != null && resource.GetType().IsSubclassOf(typeof(T)))
+					if(resource != null && resource.GetType().IsAssignableTo(typeof(T)))
 					{
 						resources.Add(resource as T);
 					}
