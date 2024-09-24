@@ -16,6 +16,8 @@ using Godot;
 	[Export] public string TooltipPrefabCategory { get; set; }
 	[Export] public float DelayTime { get; set; } = 0.0f;
 	[Export] public DisplayableResource TooltipData { get; set; }
+	[Export] public bool FollowMouse { get; set; } = true;
+	[Export] public Vector2 Offset { get; set; } = new Vector2(24.0f, -16.0f);
 	
 	#endregion // Properties
 	
@@ -45,6 +47,8 @@ using Godot;
 		this.tooltip.TopLevel = true;
 		this.tooltip.Container.ResetSize();
 		this.tooltip.Hide();
+		this.tooltip.FollowMouse = this.FollowMouse;
+		this.tooltip.Offset = this.Offset;
 		this.AddChild(this.tooltip);
 	}
 	
