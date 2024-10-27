@@ -7,8 +7,11 @@ public partial class LoadingScreen : Control
 {
 	#region Public Methods
 	
-	public void UpdateLoadingBar(DisplayableResource resource, int current, int max) {}
-	public void LoadingIsCompleted(Callable completedCallback) {}
+	public virtual void UpdateLoadingBar(DisplayableResource resource, int current, int max) {}
+	public virtual void LoadingIsCompleted(Callable completedCallback)
+	{
+		completedCallback.Call();
+	}
 	
 	#endregion // Public Methods
 }

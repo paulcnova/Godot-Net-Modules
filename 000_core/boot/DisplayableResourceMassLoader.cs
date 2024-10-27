@@ -4,6 +4,8 @@ using FLCore.Boot;
 using Godot;
 using Godot.Collections;
 
+using System.Collections.Generic;
+
 namespace FLCore.Internal
 {
 	public partial class DisplayableResourceMassLoader : Node
@@ -41,7 +43,7 @@ namespace FLCore.Internal
 			
 			if(boot == null)
 			{
-				this.LoadAllContent(GameDataPath);
+				this.LoadAllContent(100, GameDataPath);
 			}
 			base._Ready();
 		}
@@ -59,7 +61,16 @@ namespace FLCore.Internal
 		
 		#region Public Methods
 		
-		public void LoadAllContent(params string[] paths)
+		public void LoadAllContent(int batchLoad = 100, params string[] paths)
+		{
+			Timing.RunCoroutine(this.LoadAllContentAsync(batchLoad, paths));
+		}
+		
+		#endregion // Public Methods
+		
+		#region Private Methods
+		
+		public IEnumerator<double> LoadAllContentAsync(int batchLoad, string[] paths)
 		{
 			Array<DisplayableResource> resources = new Array<DisplayableResource>();
 			
@@ -72,6 +83,7 @@ namespace FLCore.Internal
 			{
 				resources.AddRange(ResourceLocator.LoadAll<DisplayableResource>(path));
 			}
+			yield return Timing.WaitForOneFrame;
 			
 			int current = 0;
 			int max = resources.Count;
@@ -79,11 +91,16 @@ namespace FLCore.Internal
 			foreach(DisplayableResource resource in resources)
 			{
 				this.EmitSignal(SignalName.ContentLoaded, resource, current++, max);
+				if(current % batchLoad == 0)
+				{
+					yield return Timing.WaitForOneFrame;
+				}
 			}
 			this.EmitSignal(SignalName.LoadingCompleted);
+			yield return Timing.WaitForOneFrame;
 		}
 		
-		#endregion // Public Methods
+		#endregion // Private Methods
 	}
 }
 
@@ -143,14 +160,14 @@ namespace FLCore
 		
 		#region Public Methods
 		
-		public static void LoadAllContent(params string[] paths)
+		public static void LoadAllContent(int batchLoad = 100, params string[] paths)
 		{
 			if(DisplayableResourceMassLoader.Instance == null)
 			{
 				GDX.PrintWarning("Displayable Resource Mass Loader is not instantiated! Could not load all content");
 				return;
 			}
-			DisplayableResourceMassLoader.Instance.LoadAllContent(paths);
+			DisplayableResourceMassLoader.Instance.LoadAllContent(batchLoad, paths);
 		}
 		
 		#endregion // Public Methods

@@ -18,6 +18,11 @@ namespace FLCore.Tooltips
 		
 		#region Godot Methods
 		
+		public override void _Ready()
+		{
+			DRML.ContentLoaded += this.FindTooltips;
+		}
+		
 		public override void _EnterTree()
 		{
 			if(Instance == null)
@@ -29,7 +34,6 @@ namespace FLCore.Tooltips
 				this.QueueFree();
 				return;
 			}
-			this.FindTooltipEntries();
 			base._EnterTree();
 		}
 		
@@ -68,45 +72,38 @@ namespace FLCore.Tooltips
 		
 		#region Private Methods
 		
-		private void FindTooltipEntries()
+		private void FindTooltips(DisplayableResource resource, int curr, int max)
 		{
-			Array<DisplayableResource> entries = ResourceLocator.LoadAll<DisplayableResource>(GameDataPath, ".+");
+			if(string.IsNullOrEmpty(resource.TooltipID)) { return; }
 			
-			foreach(DisplayableResource entry in entries)
+			string[] paths = resource.TooltipID.Split('/');
+			int i = 0;
+			Node current = this;
+			
+			foreach(string path in paths)
 			{
-				if(string.IsNullOrEmpty(entry.TooltipID)) { continue; }
+				if(i == paths.Length - 1) { break; }
 				
-				string[] paths = entry.TooltipID.Split('/');
-				int i = 0;
-				Node current = this;
+				Node next = current.GetNodeOrNull(path);
 				
-				foreach(string path in paths)
+				if(next == null)
 				{
-					if(i == paths.Length - 1)
-					{
-						break;
-					}
-					Node next = current.GetNodeOrNull(path);
+					Node folder = new Node();
 					
-					if(next == null)
-					{
-						Node folder = new Node();
-						
-						folder.Name = path;
-						current.AddChild(folder);
-						next = folder;
-					}
-					
-					current = next;
-					++i;
+					folder.Name = path;
+					current.AddChild(folder);
+					next = folder;
 				}
 				
-				TooltipEntryNode entryNode = new TooltipEntryNode();
-				
-				entryNode.TooltipPath = entry.ResourcePath;
-				entryNode.Name = paths[paths.Length - 1];
-				current.AddChild(entryNode);
+				current = next;
+				++i;
 			}
+			
+			TooltipEntryNode entryNode = new TooltipEntryNode();
+			
+			entryNode.TooltipPath = resource.ResourcePath;
+			entryNode.Name = paths[paths.Length - 1];
+			current.AddChild(entryNode);
 		}
 		
 		#endregion // Private Methods

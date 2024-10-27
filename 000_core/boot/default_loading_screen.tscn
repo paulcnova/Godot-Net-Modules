@@ -1,0 +1,51 @@
+[gd_scene load_steps=2 format=3 uid="uid://cnbm8kb685nun"]
+
+[ext_resource type="Script" path="res://modules/000_core/boot/LoadingBarLoadingScreen.cs" id="1_mcyju"]
+
+[node name="Default Loading Screen" type="Control" node_paths=PackedStringArray("ProgressBar")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_mcyju")
+ProgressBar = NodePath("ProgressBar")
+
+[node name="Backdrop" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.0627451, 0.0941176, 0.12549, 1)
+
+[node name="ProgressBar" type="ProgressBar" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -240.0
+offset_top = -24.0
+offset_right = 240.0
+offset_bottom = 24.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Loading Label" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -37.5
+offset_top = -50.0
+offset_right = 37.5
+offset_bottom = -27.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Loading..."
